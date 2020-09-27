@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+shopt -s failglob
 set -euf -o pipefail
 
 MOUNTPOINT="${MOUNTPOINT:-/mnt}"
@@ -70,7 +71,7 @@ function create_image_pi() {
 	if [[ $GRAPHICAL == true ]]; then
 		$SUDO gparted "$LOOPDEV"
 	else
-		$SUDO fdisk "$LOOPDEV"
+    printf "o\nn\np\n1\n\n+70M\nt\n0c\nn\np\n\n\n\n\nw\n" | $SUDO fdisk "$LOOPDEV"
 		$SUDO mkfs.fat -F32 -v -I -n'BOOT' "${LOOPDEV}p1"
 		$SUDO mkfs.ext4 -F -O '^64bit' -L 'root' "${LOOPDEV}p2"
 	fi
@@ -87,19 +88,16 @@ function finalize_image_pi() {
 	mkdir -p wifi-firmware
 	(
 		cd wifi-firmware || exit
-		wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43430-sdio.bin
-		wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43430-sdio.clm_blob
-		wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43430-sdio.txt
-		wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43455-sdio.bin
-		wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43455-sdio.clm_blob
-		wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43455-sdio.txt
-		cp ./*sdio* "${MOUNTPOINT}/lib/firmware/brcm/"
+		git clone https://github.com/RPi-Distro/firmware-nonfree
+    set +f
+		$SUDO cp ./firmware-nonfree/brcm/*sdio* "${MOUNTPOINT}/lib/firmware/brcm/"
+    set -f
 	)
 	rm -rf wifi-firmware
 
 	# Remove stage2.sh from root and unmount filesystem and mount points
 
-	rm "${MOUNTPOINT}/stage2.sh"
+	$SUDO rm "${MOUNTPOINT}/stage2.sh"
 	chroot_tear_down
 }
 
@@ -136,29 +134,26 @@ function base_bootstrap() {
 function setup_pi() {
 	# Setup bootloader and kernel
 
-	BOOT_VERSION="1.20200212-1"
+	BOOT_VERSION="1.20200902-1"
 	BOOT_ARCH="armhf"
 
 	wget -c "http://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-firmware/raspberrypi-bootloader_${BOOT_VERSION}_${BOOT_ARCH}.deb"
 	mkdir -p /tmp/pi-bootloader/
 	dpkg-deb -x "raspberrypi-bootloader_${BOOT_VERSION}_${BOOT_ARCH}.deb" /tmp/pi-bootloader/
-	$SUDO cp /tmp/pi-bootloader/boot/ "${MOUNTPOINT}/boot/"
+	$SUDO cp -r /tmp/pi-bootloader/boot/ "${MOUNTPOINT}/boot/"
 	rm "raspberrypi-bootloader_${BOOT_VERSION}_${BOOT_ARCH}.deb"
 
 	if [[ $1 == 4 ]]; then
 
-		VERSION='4.19.115.20200421'
+		VERSION='5.4.65.20200922'
 		PATCH='-bis'
 
 		wget -c https://github.com/sakaki-/bcm2711-kernel${PATCH}/releases/download/${VERSION}/bcm2711-kernel${PATCH}-${VERSION}.tar.xz
-		mkdir /tmp/pi-kernel
-		tar xf bcm2711-kernel${PATCH}-${VERSION}.tar.xz -C /tmp/pi-kernel/
-		$SUDO cp -r /tmp/pi-kernel/boot/ "${MOUNTPOINT}/boot/"
-		$SUDO mv "${MOUNTPOINT}/boot/kernel*.img" "${MOUNTPOINT}/boot/kernel8.img"
-		$SUDO mkdir "${MOUNTPOINT}/lib/modules"
-		$SUDO cp -r /tmp/pi-kernel/lib/modules "${MOUNTPOINT}/lib/"
+		$SUDO tar xf bcm2711-kernel${PATCH}-${VERSION}.tar.xz -C "${MOUNTPOINT}"
+    set +f
+		$SUDO mv "${MOUNTPOINT}"/boot/kernel*.img "${MOUNTPOINT}/boot/kernel8.img"
+    set -f
 		rm bcm2711-kernel${PATCH}-${VERSION}.tar.xz
-		rm -r /tmp/pi-kernel
 
 		echo "[pi4]
     # Enable DRM VC4 V3D driver on top of the dispmanx display stack

@@ -71,7 +71,7 @@ function create_image_pi() {
 	if [[ $GRAPHICAL == true ]]; then
 		$SUDO gparted "$LOOPDEV"
 	else
-    printf "o\nn\np\n1\n\n+70M\nt\n0c\nn\np\n\n\n\n\nw\n" | $SUDO fdisk "$LOOPDEV"
+		printf "o\nn\np\n1\n\n+70M\nt\n0c\nn\np\n\n\n\n\nw\n" | $SUDO fdisk "$LOOPDEV"
 		$SUDO mkfs.fat -F32 -v -I -n'BOOT' "${LOOPDEV}p1"
 		$SUDO mkfs.ext4 -F -O '^64bit' -L 'root' "${LOOPDEV}p2"
 	fi
@@ -89,9 +89,9 @@ function finalize_image_pi() {
 	(
 		cd wifi-firmware || exit
 		git clone https://github.com/RPi-Distro/firmware-nonfree
-    set +f
+		set +f
 		$SUDO cp ./firmware-nonfree/brcm/*sdio* "${MOUNTPOINT}/lib/firmware/brcm/"
-    set -f
+		set -f
 	)
 	rm -rf wifi-firmware
 
@@ -140,7 +140,7 @@ function setup_pi() {
 	wget -c "http://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-firmware/raspberrypi-bootloader_${BOOT_VERSION}_${BOOT_ARCH}.deb"
 	mkdir -p /tmp/pi-bootloader/
 	dpkg-deb -x "raspberrypi-bootloader_${BOOT_VERSION}_${BOOT_ARCH}.deb" /tmp/pi-bootloader/
-	$SUDO cp -r /tmp/pi-bootloader/boot/ "${MOUNTPOINT}/boot/"
+	$SUDO cp -r /tmp/pi-bootloader/boot/ "${MOUNTPOINT}/"
 	rm "raspberrypi-bootloader_${BOOT_VERSION}_${BOOT_ARCH}.deb"
 
 	if [[ $1 == 4 ]]; then
@@ -150,9 +150,9 @@ function setup_pi() {
 
 		wget -c https://github.com/sakaki-/bcm2711-kernel${PATCH}/releases/download/${VERSION}/bcm2711-kernel${PATCH}-${VERSION}.tar.xz
 		$SUDO tar xf bcm2711-kernel${PATCH}-${VERSION}.tar.xz -C "${MOUNTPOINT}"
-    set +f
+		set +f
 		$SUDO mv "${MOUNTPOINT}"/boot/kernel*.img "${MOUNTPOINT}/boot/kernel8.img"
-    set -f
+		set -f
 		rm bcm2711-kernel${PATCH}-${VERSION}.tar.xz
 
 		echo "[pi4]

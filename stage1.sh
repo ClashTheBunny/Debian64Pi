@@ -95,6 +95,17 @@ function finalize_image_pi() {
 	)
 	rm -rf wifi-firmware
 
+	mkdir -p cloud-init
+	(
+		cd cloud-init || exit
+    git clone https://gist.github.com/5c81708b05fb4f68aecba7367b3bf033.git cloud-init/
+		set +f
+		$SUDO cp ./cloud-init/* "${MOUNTPOINT}/boot/"
+		set -f
+	)
+	rm -rf cloud-init
+
+
 	# Remove stage2.sh from root and unmount filesystem and mount points
 
 	$SUDO rm "${MOUNTPOINT}/stage2.sh"

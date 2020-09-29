@@ -8,6 +8,26 @@ on:
 name: Upload Release Asset
 
 jobs:
+  release:
+    name: Upload Release Asset
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+			- name: Output Release URL File
+				run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
+			- name: Save Release URL File for publish
+				uses: actions/upload-artifact@v1
+				with:
+					name: release_url
+					path: release_url.txt
   build:
     name: Upload Release Asset
     runs-on: ubuntu-latest
@@ -15,20 +35,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        debian-release: [buster]
+        debian-release: [buster, bullseye, sid]
         revision: [3, 4]
-        board: [pi]
-        experimental: [false]
+        board: [pi jetson-nano]
         include:
           - board: jetson-nano
-            debian-release: [buster, bullseye, sid]
-            revision: [100, 200, 300]
+            revision: 300
             experimental: true
-          - board: pi
-            debian-release: [bullseye, sid]
-            revision: [3, 4]
+          - debian-release: buster
+            experimental: false
+          - debian-release: bullseye
+            experimental: true
+          - debian-release: sid
             experimental: true
     steps:
+			- name: Get Release File Name & Upload URL
+				id: get_release_info
+				run: |
+					value=`cat release_url/release_url.txt`
+					echo ::set-output name=upload_url::$value
+				env:
+					TAG_REF_NAME: ${{ github.ref }}
+					REPOSITORY_NAME: ${{ github.repository }}
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Build project # This would actually build your project, using zip for an example artifact
@@ -55,23 +83,13 @@ jobs:
       - name: Don't kill instace
         if: ${{ failure() }}
         run: sleep 1h # Prevent to killing instance after failure
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
       - name: Upload Release Asset
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
           asset_path: ./debian-${{ matrix.board }}-${{ matrix.revision }}-${{ matrix.debian-release }}.zip
           asset_name: debian-${{ matrix.board }}-${{ matrix.revision }}-${{ matrix.debian-release }}.zip
           asset_content_type: application/zip

@@ -4,6 +4,24 @@ on:
     tags:
     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
+continue-on-error: ${{ matrix.experimental }}
+strategy:
+  fail-fast: false
+  matrix:
+    debian-release: [buster]
+    revision: [3, 4]
+    board: [pi]
+    experimental: [false]
+    include:
+      - board: jetson-nano
+        debian-release: [buster, bullseye, sid]
+        revision: [100, 200, 300]
+        experimental: true
+      - board: pi
+        debian-release: [bullseye, sid]
+        revision: [3, 4]
+        experimental: true
+
 name: Upload Release Asset
 
 jobs:
@@ -14,12 +32,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Build project # This would actually build your project, using zip for an example artifact
+        env:
+          RELEASE: ${{ matrix.debian-release }}
+          REVISON: ${{ matrix.revision }}
+          BOARD: ${{ matrix.board }}
+          GRAPHICAL: false
         run: |
-          export GRAPHICAL=false
           sudo apt update
           sudo apt install qemu gparted debootstrap qemu-user-static schroot
           bash -x ./stage1.sh
-          zip debian-rpi64.zip debian-rpi64.img
+          zip debian-${{ matrix.board }}-${{ matrix.revision }}-${{ matrix.debian-release }}.zip debian-${{ matrix.board }}.img
       - name: Start SSH via Ngrok
         if: ${{ failure() }}
         run: curl -sL https://gist.githubusercontent.com/ClashTheBunny/ac7ca189e1f8ab9eb5686662412a4cce/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
@@ -50,6 +72,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./debian-rpi64.zip
-          asset_name: debian-rpi64.zip
+          asset_path: ./debian-${{ matrix.board }}-${{ matrix.revision }}-${{ matrix.debian-release }}.zip
+          asset_name: debian-${{ matrix.board }}-${{ matrix.revision }}-${{ matrix.debian-release }}.zip
           asset_content_type: application/zip

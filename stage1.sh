@@ -56,17 +56,17 @@ function finalize_image_jetson-nano() {
 }
 
 function create_image_pi() {
-	if [[ -f debian-rpi64.img ]]; then
-		read -p "debian-rpi64.img already exists, overwrite and start over? " -r yn
+	if [[ -f "debian-${BOARD}.img" ]]; then
+		read -p "debian-${BOARD}.img already exists, overwrite and start over? " -r yn
 		case $yn in
 		[Nn]*)
 			exit
 			;;
 		esac
 	fi
-	qemu-img create debian-rpi64.img "${SIZE}"
+	qemu-img create "debian-${BOARD}.img" "${SIZE}"
 
-	LOOPDEV=$($SUDO losetup -f -P --show debian-rpi64.img)
+	LOOPDEV=$($SUDO losetup -f -P --show "debian-${BOARD}.img")
 
 	if [[ $GRAPHICAL == true ]]; then
 		$SUDO gparted "$LOOPDEV"

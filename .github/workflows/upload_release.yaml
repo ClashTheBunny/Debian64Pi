@@ -21,13 +21,13 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-			- name: Output Release URL File
-				run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
-			- name: Save Release URL File for publish
-				uses: actions/upload-artifact@v1
-				with:
-					name: release_url
-					path: release_url.txt
+      - name: Output Release URL File
+        run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
+      - name: Save Release URL File for publish
+        uses: actions/upload-artifact@v1
+        with:
+          name: release_url
+          path: release_url.txt
   build:
     name: Upload Release Asset
     runs-on: ubuntu-latest
@@ -49,14 +49,14 @@ jobs:
           - debian-release: sid
             experimental: true
     steps:
-			- name: Get Release File Name & Upload URL
-				id: get_release_info
-				run: |
-					value=`cat release_url/release_url.txt`
-					echo ::set-output name=upload_url::$value
-				env:
-					TAG_REF_NAME: ${{ github.ref }}
-					REPOSITORY_NAME: ${{ github.repository }}
+      - name: Get Release File Name & Upload URL
+        id: get_release_info
+        run: |
+          value=`cat release_url/release_url.txt`
+          echo ::set-output name=upload_url::$value
+        env:
+          TAG_REF_NAME: ${{ github.ref }}
+          REPOSITORY_NAME: ${{ github.repository }}
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Build project # This would actually build your project, using zip for an example artifact

@@ -4,23 +4,6 @@ on:
     tags:
     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-continue-on-error: ${{ matrix.experimental }}
-strategy:
-  fail-fast: false
-  matrix:
-    debian-release: [buster]
-    revision: [3, 4]
-    board: [pi]
-    experimental: [false]
-    include:
-      - board: jetson-nano
-        debian-release: [buster, bullseye, sid]
-        revision: [100, 200, 300]
-        experimental: true
-      - board: pi
-        debian-release: [bullseye, sid]
-        revision: [3, 4]
-        experimental: true
 
 name: Upload Release Asset
 
@@ -28,6 +11,23 @@ jobs:
   build:
     name: Upload Release Asset
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        debian-release: [buster]
+        revision: [3, 4]
+        board: [pi]
+        experimental: [false]
+        include:
+          - board: jetson-nano
+            debian-release: [buster, bullseye, sid]
+            revision: [100, 200, 300]
+            experimental: true
+          - board: pi
+            debian-release: [bullseye, sid]
+            revision: [3, 4]
+            experimental: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

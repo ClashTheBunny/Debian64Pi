@@ -39,7 +39,7 @@ jobs:
       matrix:
         debian-release: [buster, bullseye, sid]
         revision: [3, 4]
-        board: [pi jetson-nano]
+        board: [pi]
         include:
           - board: jetson-nano
             revision: 300

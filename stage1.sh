@@ -163,7 +163,7 @@ function setup_pi() {
     # differentiate from Pi3 64-bit kernels
     kernel=kernel8-p4.img" | $SUDO tee -a "${MOUNTPOINT}/boot/config.txt"
 
-		echo "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait" | $SUDO tee -a "${MOUNTPOINT}/boot/cmdline.txt"
+		echo "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline ds=nocloud;s=/boot/ rootwait" | $SUDO tee -a "${MOUNTPOINT}/boot/cmdline.txt"
 
 	elif [[ $1 == 3 ]]; then
 

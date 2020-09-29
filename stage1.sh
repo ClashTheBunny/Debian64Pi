@@ -56,17 +56,17 @@ function finalize_image_jetson-nano() {
 }
 
 function create_image_pi() {
-	if [[ -f debian-rpi64.img ]]; then
-		read -p "debian-rpi64.img already exists, overwrite and start over? " -r yn
+	if [[ -f "debian-${BOARD}.img" ]]; then
+		read -p "debian-${BOARD}.img already exists, overwrite and start over? " -r yn
 		case $yn in
 		[Nn]*)
 			exit
 			;;
 		esac
 	fi
-	qemu-img create debian-rpi64.img "${SIZE}"
+	qemu-img create "debian-${BOARD}.img" "${SIZE}"
 
-	LOOPDEV=$($SUDO losetup -f -P --show debian-rpi64.img)
+	LOOPDEV=$($SUDO losetup -f -P --show "debian-${BOARD}.img")
 
 	if [[ $GRAPHICAL == true ]]; then
 		$SUDO gparted "$LOOPDEV"
@@ -94,6 +94,17 @@ function finalize_image_pi() {
 		set -f
 	)
 	rm -rf wifi-firmware
+
+	mkdir -p cloud-init
+	(
+		cd cloud-init || exit
+    git clone https://gist.github.com/5c81708b05fb4f68aecba7367b3bf033.git cloud-init/
+		set +f
+		$SUDO cp ./cloud-init/* "${MOUNTPOINT}/boot/"
+		set -f
+	)
+	rm -rf cloud-init
+
 
 	# Remove stage2.sh from root and unmount filesystem and mount points
 

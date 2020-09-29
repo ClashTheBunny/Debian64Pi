@@ -43,9 +43,6 @@ apt install device-tree-compiler fontconfig fontconfig-config fonts-dejavu-core 
 #apt install task-lxde-desktop -y # For LXDE
 #apt install task-lxqt-desktop -y # For LXQT
 
-# Setup default cloud-init, at least edit it so that the wifi password is correct
-git clone https://gist.github.com/5c81708b05fb4f68aecba7367b3bf033.git /boot/
-
 # Add emergency debian:debian user
 # shellcheck disable=SC2016
 useradd -m -p '$6$bESbi8ENieH9wyMV$m/4ZAjsFJxdYGhp29MO/haSCfjv2Y6IBuBYa.2up8QhNTA2xevXHEFQj16xWDDGC3EtdgqlX6B1fiT/3FUJ8P1' -s /bin/bash debian # debian / debian

@@ -145,7 +145,7 @@ function base_bootstrap() {
   echo "
   allow-hotplug wlan0
   iface wlan0 inet dhcp
-  wpa-conf
+  wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
   iface default inet dhcp" | $SUDO tee -a "${MOUNTPOINT}/etc/network/interfaces.d/wlan0" 
 }
 

@@ -154,19 +154,27 @@ function setup_pi() {
 	$SUDO cp -r /tmp/pi-bootloader/boot/ "${MOUNTPOINT}/"
 	rm "raspberrypi-bootloader_${BOOT_VERSION}_${BOOT_ARCH}.deb"
 
+
+  # kernel setup
+	VERSION='5.4.65.20200922'
+	PATCH='-bis'
+
 	if [[ $1 == 4 ]]; then
+		KERNEL='bcm2711'
+	elif [[ $1 == 3 ]]; then
+		KERNEL='bcmrpi3'
+  fi
 
-		VERSION='5.4.65.20200922'
-		PATCH='-bis'
+	wget -c https://github.com/sakaki-/${KERNEL}-kernel${PATCH}/releases/download/${VERSION}/${KERNEL}-kernel${PATCH}-${VERSION}.tar.xz
+	$SUDO tar xf ${KERNEL}-kernel${PATCH}-${VERSION}.tar.xz -C "${MOUNTPOINT}"
+	set +f
+	$SUDO mv "${MOUNTPOINT}"/boot/kernel*.img "${MOUNTPOINT}/boot/kernel8.img"
+	set -f
+	rm ${KERNEL}-kernel${PATCH}-${VERSION}.tar.xz
 
-		wget -c https://github.com/sakaki-/bcm2711-kernel${PATCH}/releases/download/${VERSION}/bcm2711-kernel${PATCH}-${VERSION}.tar.xz
-		$SUDO tar xf bcm2711-kernel${PATCH}-${VERSION}.tar.xz -C "${MOUNTPOINT}"
-		set +f
-		$SUDO mv "${MOUNTPOINT}"/boot/kernel*.img "${MOUNTPOINT}/boot/kernel8.img"
-		set -f
-		rm bcm2711-kernel${PATCH}-${VERSION}.tar.xz
 
-		echo "[pi4]
+  # It's fine to have this on a pi3, as it will be ignored.
+	echo "[pi4]
     # Enable DRM VC4 V3D driver on top of the dispmanx display stack
     dtoverlay=vc4-fkms-v3d
     max_framebuffers=2
@@ -174,22 +182,9 @@ function setup_pi() {
     # differentiate from Pi3 64-bit kernels
     kernel=kernel8-p4.img" | $SUDO tee -a "${MOUNTPOINT}/boot/config.txt"
 
-		echo "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline ds=nocloud;s=/boot/ rootwait" | $SUDO tee -a "${MOUNTPOINT}/boot/cmdline.txt"
+	echo "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline ds=nocloud;s=/boot/ rootwait" | $SUDO tee -a "${MOUNTPOINT}/boot/cmdline.txt"
 
-	elif [[ $1 == 3 ]]; then
 
-		wget -c https://github.com/sakaki-/bcmrpi3-kernel/releases/download/4.19.89.20191224/bcmrpi3-kernel-4.19.89.20191224.tar.xz
-		mkdir /tmp/pi-kernel
-		tar xf bcmrpi3-kernel-4.19.89.20191224.tar.xz -C /tmp/pi-kernel/
-		cp -r /tmp/pi-kernel/boot/ "${MOUNTPOINT}/boot/"
-		mkdir "${MOUNTPOINT}/lib/modules"
-		cp -r /tmp/pi-kernel/lib/modules "${MOUNTPOINT}/lib/"
-		rm bcmrpi3-kernel-4.19.89.20191224.tar.xz
-		rm -r /tmp/pi-kernel
-
-		echo "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait" | $SUDO tee -a "${MOUNTPOINT}/boot/cmdline.txt"
-
-	fi
 }
 
 function setup_jetson-nano() {

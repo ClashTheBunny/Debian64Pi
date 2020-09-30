@@ -35,7 +35,7 @@ function finalize_image_jetson-nano() {
 	$SUDO cp libjpeg-turbo-dummy_1.0_all.deb "${MOUNTPOINT}"
 	$SUDO chroot "${MOUNTPOINT}" dpkg -i libjpeg-turbo-dummy_1.0_all.deb || true
 	$SUDO rm "${MOUNTPOINT}/libjpeg-turbo-dummy_1.0_all.deb"
-	$SUDO chroot "${MOUNTPOINT}" apt -f install
+	$SUDO chroot "${MOUNTPOINT}" apt -f install -y
 
 	(
 		cd /tmp/jetson_driver_package/Linux_for_Tegra/ || exit

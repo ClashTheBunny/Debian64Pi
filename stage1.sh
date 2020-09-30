@@ -142,6 +142,11 @@ function base_bootstrap() {
 	deb http://ftp.debian.org/debian ${RELEASE}-backports main
 	#deb-src http://ftp.debian.org/debian ${RELEASE}-backports main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
 
+  echo "
+  allow-hotplug wlan0
+  iface wlan0 inet dhcp
+  wpa-conf
+  iface default inet dhcp" | $SUDO tee -a "${MOUNTPOINT}/etc/network/interfaces.d/wlan0" 
 }
 
 function setup_pi() {

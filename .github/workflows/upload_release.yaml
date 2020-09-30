@@ -32,8 +32,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        debian-release: [buster, bullseye, sid]
-        revision: [3, 4]
+        debian-release: [bullseye, buster, sid]
+        revision: [4, 3]
         board: [pi]
         include:
           - board: jetson-nano

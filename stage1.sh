@@ -163,7 +163,7 @@ function setup_pi() {
 
 
   # kernel setup
-	VERSION='5.4.65.20200922'
+	VERSION='5.4.69.20201006'
 	PATCH='-bis'
 
 	if [[ $1 == 4 ]]; then

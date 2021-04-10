@@ -57,7 +57,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install qemu gparted debootstrap qemu-user-static schroot
-          bash -x ./stage1.sh
+          bash -x ./build.sh
           zip debian-${{ matrix.board }}-${{ matrix.revision }}-${{ matrix.debian-release }}.zip debian-${{ matrix.board }}.img
       - name: Start SSH via Ngrok
         if: ${{ failure() }}

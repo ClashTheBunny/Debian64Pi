@@ -193,7 +193,7 @@ function base_bootstrap() {
 
 function setup_pi() {
   LATEST_PI_RELEASE="buster"
-  $SUDO apt-key --keyring ${MOUNTPOINT}/usr/share/keyrings/1password.gpg adv --keyserver keyserver.ubuntu.com --recv-keys 8738CD6B956F460C
+  $SUDO apt-key --keyring ${MOUNTPOINT}/usr/share/keyrings/1password.gpg adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
 
 	echo "deb [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main
 	#deb-src [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list.d/rpi.list"

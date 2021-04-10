@@ -56,7 +56,7 @@ jobs:
           GRAPHICAL: false
         run: |
           sudo apt update
-          sudo apt install qemu gparted debootstrap qemu-user-static schroot
+          sudo apt install qemu gparted debootstrap qemu-user-static qemu-utils schroot
           bash -x ./build.sh
           zip debian-${{ matrix.board }}-${{ matrix.revision }}-${{ matrix.debian-release }}.zip debian-${{ matrix.board }}.img
       - name: Start SSH via Ngrok

@@ -129,7 +129,15 @@ function finalize_image_pi() {
 
   common_apt
 
-  $SUDO chroot "${MOUNTPOINT}" apt install -t buster raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-firmware -y
+  LATEST_PI_RELEASE="buster"
+  $SUDO apt-key --keyring ${MOUNTPOINT}/usr/share/keyrings/rpi.gpg adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
+
+	echo "deb [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main
+	#deb-src [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list.d/rpi.list"
+
+  $SUDO chroot "${MOUNTPOINT}" apt update
+
+  $SUDO chroot "${MOUNTPOINT}" apt install -t buster raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader -y
 
 	# Install Pi-compatible WiFi drivers to image
 
@@ -192,11 +200,6 @@ function base_bootstrap() {
 }
 
 function setup_pi() {
-  LATEST_PI_RELEASE="buster"
-  $SUDO apt-key --keyring ${MOUNTPOINT}/usr/share/keyrings/rpi.gpg adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
-
-	echo "deb [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main
-	#deb-src [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list.d/rpi.list"
 	# Setup bootloader config
 
   # It's fine to have this on a pi3, as it will be ignored.

@@ -5,7 +5,7 @@ set -euf -o pipefail
 
 MOUNTPOINT="${MOUNTPOINT:-/mnt}"
 GRAPHICAL="${GRAPHICAL:-true}"
-RELEASE="${RELEASE:-buster}"
+RELEASE="${RELEASE:-stable}"
 BOARD="${BOARD:-pi}"
 REVISION="${REVISION:-4}"
 SIZE="${3:-3G}"
@@ -63,7 +63,6 @@ keyboard-configuration  keyboard-configuration/optionscode      string" | $SUDO 
 
 $SUDO chroot "${MOUNTPOINT}" apt update
 $SUDO chroot "${MOUNTPOINT}" apt install locales -y
-$SUDO chroot "${MOUNTPOINT}" apt upgrade -y
 $SUDO chroot "${MOUNTPOINT}" apt install console-setup keyboard-configuration sudo ssh curl wget dbus usbutils ca-certificates crda less fbset debconf-utils avahi-daemon fake-hwclock nfs-common apt-utils man-db pciutils ntfs-3g apt-listchanges -y
 $SUDO chroot "${MOUNTPOINT}" apt install wpasupplicant wireless-tools firmware-atheros firmware-brcm80211 firmware-libertas firmware-misc-nonfree firmware-realtek dhcpcd5 net-tools cloud-init -y
 $SUDO chroot "${MOUNTPOINT}" apt install device-tree-compiler fontconfig fontconfig-config fonts-dejavu-core libcairo2 libdatrie1 libfontconfig1 libfreetype6 libfribidi0 libgles2 libglib2.0-0 libglib2.0-data libgraphite2-3 libharfbuzz0b libpango-1.0-0 libpangoft2-1.0-0 libpixman-1-0 libpng16-16 libthai-data libthai0 libxcb-render0 libxcb-shm0 libxrender1 shared-mime-info xdg-user-dirs libdrm-common libdrm2 libegl-mesa0 libegl1 libgbm1 libglapi-mesa libglvnd0 libwayland-client0 libwayland-server0 libx11-xcb1 libxcb-dri2-0 libxcb-dri3-0 libxcb-present0 libxcb-sync1 libxcb-xfixes0 libxshmfence1 -y
@@ -81,7 +80,7 @@ function finalize_image_jetson-nano() {
 	(
 		cd /tmp/jetson_driver_package/Linux_for_Tegra/ || exit
 
-		sudo cp "${MOUNTPOINT}/../nv_tegra/l4t_deb_packages/nvidia-l4t-init_32.4.2-20200408182156_arm64.deb" "${MOUNTPOINT}"
+		sudo cp "nv_tegra/l4t_deb_packages/nvidia-l4t-init_32.4.2-20200408182156_arm64.deb" "${MOUNTPOINT}"
 		$SUDO chroot "${MOUNTPOINT}" dpkg -i --force-confnew --force-depends --force-overwrite /nvidia-l4t-init_32.4.2-20200408182156_arm64.deb
 		$SUDO rm "${MOUNTPOINT}/nvidia-l4t-init_32.4.2-20200408182156_arm64.deb"
 
@@ -139,6 +138,10 @@ function finalize_image_pi() {
 
   $SUDO chroot "${MOUNTPOINT}" apt install -t buster raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader -y
 
+  $SUDO mv "${MOUNTPOINT}/etc/apt/sources.list.d/rpi.list" "${MOUNTPOINT}/etc/apt/sources.list.d/rpi.list.ignore"
+
+  $SUDO chroot "${MOUNTPOINT}" apt update
+
 	# Install Pi-compatible WiFi drivers to image
 
 	mkdir -p wifi-firmware
@@ -166,7 +169,9 @@ function finalize_image_pi() {
 
 function base_bootstrap() {
 
-	$SUDO qemu-debootstrap --arch=arm64 "${RELEASE}" "${MOUNTPOINT}"
+  SNAPSHOT_DATE="20210103T144403Z"
+
+  $SUDO qemu-debootstrap --components=main,contrib,non-free --arch=arm64 "${RELEASE}" "${MOUNTPOINT}" "https://snapshot.debian.org/archive/debian/${SNAPSHOT_DATE}/"
 
 	# Make internet available from within the chroot, and setup fstab, hostname, and sources.list
 
@@ -181,16 +186,20 @@ function base_bootstrap() {
 	echo "debian-rpi64" | $SUDO tee "${MOUNTPOINT}/etc/hostname"
 
 	echo "deb http://deb.debian.org/debian/ ${RELEASE} main contrib non-free
-	#deb-src http://deb.debian.org/debian/ ${RELEASE} main contrib non-free
+	#deb-src http://deb.debian.org/debian/ ${RELEASE} main contrib non-free " | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
 
-	deb http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free
-	#deb-src http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free
+  if [[ ${RELEASE} == "stable" ]]; then
 
-	deb http://deb.debian.org/debian-security ${RELEASE}/updates main contrib non-free
-	#deb-src http://deb.debian.org/debian-security ${RELEASE}/updates main contrib non-free
+    echo "deb http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free
+    #deb-src http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free
 
-	deb http://ftp.debian.org/debian ${RELEASE}-backports main
-	#deb-src http://ftp.debian.org/debian ${RELEASE}-backports main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
+    deb http://deb.debian.org/debian-security ${RELEASE}/updates main contrib non-free
+    #deb-src http://deb.debian.org/debian-security ${RELEASE}/updates main contrib non-free
+
+    deb http://ftp.debian.org/debian ${RELEASE}-backports main
+    #deb-src http://ftp.debian.org/debian ${RELEASE}-backports main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
+
+  fi
 
   echo "
   allow-hotplug wlan0

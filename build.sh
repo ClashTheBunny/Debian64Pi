@@ -4,7 +4,7 @@ shopt -s failglob
 set -euf -o pipefail
 
 MOUNTPOINT="${MOUNTPOINT:-/mnt}"
-GRAPHICAL="${GRAPHICAL:-true}"
+GRAPHICAL="${GRAPHICAL:-false}"
 RELEASE="${RELEASE:-stable}"
 BOARD="${BOARD:-pi}"
 REVISION="${REVISION:-4}"
@@ -134,13 +134,19 @@ function finalize_image_pi() {
 	echo "deb [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main
 	#deb-src [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list.d/rpi.list"
 
+  echo "# Never prefer packages from the my-custom-repo repository
+  Package: *
+  Pin: origin archive.raspberrypi.org
+  Pin-Priority: 1
+
+  # Allow upgrading only my-specific-software from my-custom-repo
+  Package: raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader
+  Pin: origin archive.raspberrypi.org
+  Pin-Priority: 500" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/preferences.d/99-rpi"
+
   $SUDO chroot "${MOUNTPOINT}" apt update
 
   $SUDO chroot "${MOUNTPOINT}" apt install -t buster raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader -y
-
-  $SUDO mv "${MOUNTPOINT}/etc/apt/sources.list.d/rpi.list" "${MOUNTPOINT}/etc/apt/sources.list.d/rpi.list.ignore"
-
-  $SUDO chroot "${MOUNTPOINT}" apt update
 
 	# Install Pi-compatible WiFi drivers to image
 
@@ -204,8 +210,7 @@ function base_bootstrap() {
   echo "
   allow-hotplug wlan0
   iface wlan0 inet dhcp
-  wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
-  iface default inet dhcp" | $SUDO tee -a "${MOUNTPOINT}/etc/network/interfaces.d/wlan0" 
+  wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf" | $SUDO tee -a "${MOUNTPOINT}/etc/network/interfaces.d/wlan0" 
 }
 
 function setup_pi() {

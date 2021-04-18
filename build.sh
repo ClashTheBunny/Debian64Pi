@@ -140,13 +140,13 @@ function finalize_image_pi() {
   Pin-Priority: 1
 
   # Allow upgrading only my-specific-software from my-custom-repo
-  Package: raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader
+  Package: raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader rpi-eeprom
   Pin: origin archive.raspberrypi.org
   Pin-Priority: 500" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/preferences.d/99-rpi"
 
   $SUDO chroot "${MOUNTPOINT}" apt update
 
-  $SUDO chroot "${MOUNTPOINT}" apt install -t buster raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader -y
+  $SUDO chroot "${MOUNTPOINT}" apt install -t buster raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader rpi-eeprom -y
 
 	# Install Pi-compatible WiFi drivers to image
 

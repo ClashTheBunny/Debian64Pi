@@ -98,7 +98,7 @@ function finalize_image_jetson-nano() {
 }
 
 function create_image_pi() {
-	if [[ -f "debian-${BOARD}.img" ]]; then
+	if [[ -f "debian-${BOARD}.img" ]] && [[ -z "$CI" ]]; then
 		read -p "debian-${BOARD}.img already exists, overwrite and start over? " -r yn
 		case $yn in
 		[Nn]*)
@@ -175,9 +175,7 @@ function finalize_image_pi() {
 
 function base_bootstrap() {
 
-  SNAPSHOT_DATE="20210103T144403Z"
-
-  $SUDO qemu-debootstrap --components=main,contrib,non-free --arch=arm64 "${RELEASE}" "${MOUNTPOINT}" "https://snapshot.debian.org/archive/debian/${SNAPSHOT_DATE}/"
+  $SUDO qemu-debootstrap --components=main,contrib,non-free --arch=arm64 "${RELEASE}" "${MOUNTPOINT}"
 
 	# Make internet available from within the chroot, and setup fstab, hostname, and sources.list
 

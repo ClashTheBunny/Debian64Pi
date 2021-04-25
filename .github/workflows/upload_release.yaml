@@ -55,7 +55,20 @@ jobs:
           REVISON: ${{ matrix.revision }}
           BOARD: ${{ matrix.board }}
           GRAPHICAL: false
+          CI: true
         run: |
+          echo "deb http://us.archive.ubuntu.com/ubuntu/ groovy main restricted universe
+          deb-src http://us.archive.ubuntu.com/ubuntu/ groovy main restricted universe
+          " | sudo tee -a "/etc/apt/sources.list.d/groovy.list"
+
+          echo "# Never prefer packages from groovy
+          Package: *
+          Pin: release n=groovy
+          Pin-Priority: 1
+
+          Package: qemu-user-static qemu
+          Pin: release n=groovy
+          Pin-Priority: 500" | sudo tee -a "/etc/apt/preferences.d/99-groovy"
           sudo apt update
           sudo apt install qemu gparted debootstrap qemu-user-static qemu-utils schroot debian-keyring debian-archive-keyring
           bash -x ./build.sh

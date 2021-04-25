@@ -175,9 +175,11 @@ function finalize_image_pi() {
 
 function base_bootstrap() {
 
-  SNAPSHOT_DATE="20210103T144403Z"
+  # SNAPSHOT_DATE="20210103T144403Z"
+  # URL="https://snapshot.debian.org/archive/debian/${SNAPSHOT_DATE}/"
+  $URL=""
 
-  $SUDO qemu-debootstrap --components=main,contrib,non-free --arch=arm64 "${RELEASE}" "${MOUNTPOINT}" "https://snapshot.debian.org/archive/debian/${SNAPSHOT_DATE}/"
+  $SUDO qemu-debootstrap --components=main,contrib,non-free --arch=arm64 "${RELEASE}" "${MOUNTPOINT}" "$URL"
 
 	# Make internet available from within the chroot, and setup fstab, hostname, and sources.list
 

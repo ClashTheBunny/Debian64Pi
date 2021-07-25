@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ssh-key: "${{ secrets.COMMIT_KEY }}"
       - name: Get latest Packages.gz
         run: |
           wget https://archive.raspberrypi.org/debian/dists/buster/main/binary-arm64/Packages.gz

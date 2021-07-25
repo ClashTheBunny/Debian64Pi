@@ -1,0 +1,32 @@
+name: Check for and tag new release on upstream kernel bump
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * *'
+
+jobs:
+  check:
+    name: Check for updated upstream kernel bump
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get latest Packages.gz
+        run: |
+          wget https://archive.raspberrypi.org/debian/dists/buster/main/binary-arm64/Packages.gz
+      - name: Check for update
+        run: |
+          zgrep "Filename:.*raspberrypi-kernel_" Packages.gz | sed -e 's/.*raspberrypi-kernel/raspberrypi-kernel/g' > latest_kernel
+          rm Packages.gz
+      - name: Commit update if diff
+        run: |
+          if output=$(git status --porcelain) && [[ -n "${output}" ]]; then
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+            git add latest_kernel
+            git commit -m "auto-bumping kernel"
+            git push
+            git tag v$(cat latest_kernel | cut -d _ -f 2)
+            git push --tags
+          fi

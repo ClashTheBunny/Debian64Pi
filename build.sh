@@ -197,11 +197,11 @@ function base_bootstrap() {
     echo "deb http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free
     #deb-src http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free
 
-    deb http://deb.debian.org/debian-security ${RELEASE}/updates main contrib non-free
-    #deb-src http://deb.debian.org/debian-security ${RELEASE}/updates main contrib non-free
+    deb http://deb.debian.org/debian-security ${RELEASE}-security main contrib non-free
+    #deb-src http://deb.debian.org/debian-security ${RELEASE}-security main contrib non-free
 
-    deb http://ftp.debian.org/debian ${RELEASE}-backports main
-    #deb-src http://ftp.debian.org/debian ${RELEASE}-backports main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
+    deb http://deb.debian.org/debian ${RELEASE}-backports main
+    #deb-src http://deb.debian.org/debian ${RELEASE}-backports main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
 
   fi
 

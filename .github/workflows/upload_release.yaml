@@ -25,6 +25,7 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+          allowUpdates: true
   build:
     name: Upload Release Asset
     runs-on: ubuntu-latest

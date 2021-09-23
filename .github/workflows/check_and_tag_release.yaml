@@ -29,6 +29,6 @@ jobs:
             git add latest_kernel
             git commit -m "auto-bumping kernel"
             git push
-            git tag v$(cat latest_kernel | cut -d _ -f 2)
+            git tag v$(cat latest_kernel | cut -d _ -f 2 | tr -d ' ~^:?*[\\')
             git push --tags
           fi

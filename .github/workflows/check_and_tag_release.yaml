@@ -1,5 +1,5 @@
-name: Check for and tag new release on upstream kernel bump
 
+name: Check for and tag new release on upstream kernel bump
 on:
   workflow_dispatch:
   schedule:
@@ -23,6 +23,8 @@ jobs:
           rm Packages.gz
       - name: Commit update if diff
         run: |
+          git fetch -a
+          git reset --hard origin/main
           if output=$(git status --porcelain) && [[ -n "${output}" ]]; then
             git config user.name github-actions
             git config user.email github-actions@github.com

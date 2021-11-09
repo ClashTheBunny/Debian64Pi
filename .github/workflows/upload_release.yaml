@@ -58,7 +58,7 @@ jobs:
         id: build
         env:
           RELEASE: ${{ matrix.debian-release }}
-          REVISON: ${{ matrix.revision }}
+          REVISION: ${{ matrix.revision }}
           BOARD: ${{ matrix.board }}
           MOUNTPOINT: ${{ matrix.mountpoint }}
           TEMPDIR: ${{ matrix.tempdir }}

@@ -37,10 +37,14 @@ jobs:
         debian-release: [testing, stable, sid]
         revision: ["3or4"]
         board: [pi]
+        tempdir: [/tmp]
+        mountpoint: [/mnt]
         include:
           - board: jetson-nano
             revision: 300
             experimental: true
+            tempdir: /tmpdir 
+            mountpoint: /tmpdir/jetson_driver_package/Linux_for_Tegra/rootfs
           - debian-release: stable
             experimental: false
           - debian-release: testing
@@ -56,6 +60,8 @@ jobs:
           RELEASE: ${{ matrix.debian-release }}
           REVISON: ${{ matrix.revision }}
           BOARD: ${{ matrix.board }}
+          MOUNTPOINT: ${{ matrix.mountpoint }}
+          TEMPDIR: ${{ matrix.tempdir }}
           GRAPHICAL: false
           CI: true
         run: |

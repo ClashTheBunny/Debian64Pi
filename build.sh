@@ -5,10 +5,12 @@ set -euf -o pipefail
 
 MOUNTPOINT="${MOUNTPOINT:-/mnt}"
 GRAPHICAL="${GRAPHICAL:-false}"
+CI="${CI:-false}"
 RELEASE="${RELEASE:-stable}"
 BOARD="${BOARD:-pi}"
 REVISION="${REVISION:-4}"
 SIZE="${3:-3G}"
+TEMPDIR="${TEMPDIR:-/tmp}"
 
 if [[ $EUID -ne 0 ]]; then
 	SUDO="${SUDO:-sudo}"
@@ -19,9 +21,9 @@ fi
 function download_tegra_driver_package() {
 	wget -c https://developer.nvidia.com/embedded/L4T/r32_Release_v4.2/t210ref_release_aarch64/Tegra210_Linux_R32.4.2_aarch64.tbz2
 	# wget -c https://developer.nvidia.com/embedded/L4T/r32_Release_v4.2/t210ref_release_aarch64/Tegra_Linux_Sample-Root-Filesystem_R32.4.2_aarch64.tbz2
-	mkdir -p /tmp/jetson_driver_package/
-	tar xf Tegra210_Linux_R32.4.2_aarch64.tbz2 -C /tmp/jetson_driver_package/
-	# tar xf Tegra_Linux_Sample-Root-Filesystem_R32.4.2_aarch64.tbz2 -C /tmp/jetson_driver_package/rootfs/
+	$SUDO mkdir -p "${TEMPDIR}/jetson_driver_package/"
+	$SUDO tar xf Tegra210_Linux_R32.4.2_aarch64.tbz2 -C "${TEMPDIR}/jetson_driver_package/"
+	$SUDO chown root:root "${TEMPDIR}/jetson_driver_package/Linux_for_Tegra/rootfs"
 }
 
 function create_image_jetson-nano() {
@@ -77,28 +79,30 @@ function finalize_image_jetson-nano() {
 	$SUDO rm "${MOUNTPOINT}/libjpeg-turbo-dummy_1.0_all.deb"
 	$SUDO chroot "${MOUNTPOINT}" apt -f install -y
 
+  $SUDO chroot "${MOUNTPOINT}" apt install libwayland-egl1 libxkbcommon0 libasound2 libgstreamer1.0-0 libdw1 libunwind8 libasound2-data libgstreamer-plugins-bad1.0-0 libgstreamer-plugins-base1.0-0 libpangocairo-1.0-0 liborc-0.4-0 libffi8 python2.7 python2.7-minimal libpython2.7-minimal libpython2.7-stdlib mime-support mailcap perl  libperl5.32 perl-modules-5.32 libgdbm-compat4 -y
+
 	(
-		cd /tmp/jetson_driver_package/Linux_for_Tegra/ || exit
+		cd "${TEMPDIR}/jetson_driver_package/Linux_for_Tegra" || exit
 
 		sudo cp "nv_tegra/l4t_deb_packages/nvidia-l4t-init_32.4.2-20200408182156_arm64.deb" "${MOUNTPOINT}"
 		$SUDO chroot "${MOUNTPOINT}" dpkg -i --force-confnew --force-depends --force-overwrite /nvidia-l4t-init_32.4.2-20200408182156_arm64.deb
 		$SUDO rm "${MOUNTPOINT}/nvidia-l4t-init_32.4.2-20200408182156_arm64.deb"
 
-		$SUDO chroot "${MOUNTPOINT}" groupdel trusty
-		$SUDO chroot "${MOUNTPOINT}" groupdel crypto
+		# $SUDO chroot "${MOUNTPOINT}" groupdel trusty
+		# $SUDO chroot "${MOUNTPOINT}" groupdel crypto
 
-		$SUDO ./apply_binaries.sh
+		$SUDO ./apply_binaries.sh || true
 
 	)
 
 	chroot_tear_down
 
-	$SUDO /tmp/jetson_driver_package/Linux_for_Tegra/tools/jetson-disk-image-creator.sh -o "debian-${BOARD}.img" -b "${BOARD}" -r "$REVISION"
+	$SUDO "${TEMPDIR}/jetson_driver_package/Linux_for_Tegra/tools/jetson-disk-image-creator.sh" -o "debian-${BOARD}.img" -b "${BOARD}" -r "$REVISION"
 
 }
 
 function create_image_pi() {
-	if [[ -f "debian-${BOARD}.img" ]] && [[ -z "$CI" ]]; then
+	if [[ -f "debian-${BOARD}.img" ]] && [[ "$CI" == "false" ]]; then
 		read -p "debian-${BOARD}.img already exists, overwrite and start over? " -r yn
 		case $yn in
 		[Nn]*)
@@ -244,8 +248,8 @@ function chroot_tear_down() {
 	$SUDO umount "${MOUNTPOINT}/sys"
 	$SUDO umount "${MOUNTPOINT}/dev/pts"
 	$SUDO umount "${MOUNTPOINT}/dev" -l
-	$SUDO umount "${MOUNTPOINT}/boot"
-	$SUDO umount "${MOUNTPOINT}" -l
+	$SUDO umount "${MOUNTPOINT}/boot" || true
+	$SUDO umount "${MOUNTPOINT}" -l || true
 }
 
 function main() {

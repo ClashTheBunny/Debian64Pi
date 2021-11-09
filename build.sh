@@ -79,7 +79,7 @@ function finalize_image_jetson-nano() {
 	$SUDO rm "${MOUNTPOINT}/libjpeg-turbo-dummy_1.0_all.deb"
 	$SUDO chroot "${MOUNTPOINT}" apt -f install -y
 
-  $SUDO chroot "${MOUNTPOINT}" apt install libwayland-egl1 libxkbcommon0 libasound2 libgstreamer1.0-0 libdw1 libunwind8 libasound2-data libgstreamer-plugins-bad1.0-0 libgstreamer-plugins-base1.0-0 libpangocairo-1.0-0 liborc-0.4-0 libffi8 python2.7 python2.7-minimal libpython2.7-minimal libpython2.7-stdlib mime-support mailcap perl  libperl5.32 perl-modules-5.32 libgdbm-compat4 -y
+  $SUDO chroot "${MOUNTPOINT}" apt install libwayland-egl1 libxkbcommon0 libasound2 libgstreamer1.0-0 libdw1 libunwind8 libasound2-data libgstreamer-plugins-bad1.0-0 libgstreamer-plugins-base1.0-0 libpangocairo-1.0-0 liborc-0.4-0 python2.7 python2.7-minimal libpython2.7-minimal libpython2.7-stdlib mime-support mailcap perl  libperl5.32 perl-modules-5.32 libgdbm-compat4 libffi-dev -y || true
 
 	(
 		cd "${TEMPDIR}/jetson_driver_package/Linux_for_Tegra" || exit

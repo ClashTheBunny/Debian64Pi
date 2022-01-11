@@ -132,7 +132,7 @@ function finalize_image_pi() {
 
   common_apt
 
-  LATEST_PI_RELEASE="buster"
+  LATEST_PI_RELEASE="bullseye"
   $SUDO apt-key --keyring ${MOUNTPOINT}/usr/share/keyrings/rpi.gpg adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
 
 	echo "deb [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main
@@ -150,7 +150,7 @@ function finalize_image_pi() {
 
   $SUDO chroot "${MOUNTPOINT}" apt update
 
-  $SUDO chroot "${MOUNTPOINT}" apt install -t buster raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader rpi-eeprom -y
+  $SUDO chroot "${MOUNTPOINT}" apt install -t $LATEST_PI_RELEASE raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader rpi-eeprom -y
 
 	# Install Pi-compatible WiFi drivers to image
 

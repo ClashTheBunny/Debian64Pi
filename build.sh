@@ -66,7 +66,7 @@ keyboard-configuration  keyboard-configuration/optionscode      string" | $SUDO 
 $SUDO chroot "${MOUNTPOINT}" apt update
 $SUDO chroot "${MOUNTPOINT}" apt install locales -y
 $SUDO chroot "${MOUNTPOINT}" apt install console-setup keyboard-configuration sudo ssh curl wget dbus usbutils ca-certificates crda less fbset debconf-utils avahi-daemon fake-hwclock nfs-common apt-utils man-db pciutils ntfs-3g apt-listchanges -y
-$SUDO chroot "${MOUNTPOINT}" apt install wpasupplicant wireless-tools firmware-atheros firmware-brcm80211 firmware-libertas firmware-misc-nonfree firmware-realtek dhcpcd5 net-tools cloud-init -y
+$SUDO chroot "${MOUNTPOINT}" apt install wpasupplicant wireless-tools firmware-atheros firmware-brcm80211 firmware-libertas firmware-misc-nonfree firmware-realtek dhcpcd5 net-tools cloud-init chrony -y
 $SUDO chroot "${MOUNTPOINT}" apt install device-tree-compiler fontconfig fontconfig-config fonts-dejavu-core libcairo2 libdatrie1 libfontconfig1 libfreetype6 libfribidi0 libgles2 libglib2.0-0 libglib2.0-data libgraphite2-3 libharfbuzz0b libpango-1.0-0 libpangoft2-1.0-0 libpixman-1-0 libpng16-16 libthai-data libthai0 libxcb-render0 libxcb-shm0 libxrender1 shared-mime-info xdg-user-dirs libdrm-common libdrm2 libegl-mesa0 libegl1 libgbm1 libglapi-mesa libglvnd0 libwayland-client0 libwayland-server0 libx11-xcb1 libxcb-dri2-0 libxcb-dri3-0 libxcb-present0 libxcb-sync1 libxcb-xfixes0 libxshmfence1 -y
 }
 

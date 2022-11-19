@@ -11,7 +11,7 @@ name: Upload Release Asset
 jobs:
   release:
     name: Create Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
@@ -65,18 +65,6 @@ jobs:
           GRAPHICAL: false
           CI: true
         run: |
-          echo "deb http://us.archive.ubuntu.com/ubuntu/ impish main restricted universe
-          deb-src http://us.archive.ubuntu.com/ubuntu/ impish main restricted universe
-          " | sudo tee -a "/etc/apt/sources.list.d/impish.list"
-
-          echo "# Never prefer packages from impish
-          Package: *
-          Pin: release n=impish
-          Pin-Priority: 1
-
-          Package: qemu-user-static qemu
-          Pin: release n=impish
-          Pin-Priority: 500" | sudo tee -a "/etc/apt/preferences.d/99-impish"
           sudo apt update
           sudo apt install qemu gparted debootstrap qemu-user-static qemu-utils schroot debian-keyring debian-archive-keyring
           bash -x ./build.sh

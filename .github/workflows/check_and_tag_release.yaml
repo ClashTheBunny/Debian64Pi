@@ -20,7 +20,7 @@ jobs:
           git reset --hard origin/main
       - name: Get latest Packages.gz
         run: |
-          wget https://archive.raspberrypi.org/debian/dists/bullseye/main/binary-arm64/Packages.gz
+          wget https://archive.raspberrypi.org/debian/dists/bookworm/main/binary-arm64/Packages.gz
       - name: Check for update
         run: |
           zgrep "Filename:.*raspberrypi-kernel_" Packages.gz | sed -e 's/.*raspberrypi-kernel/raspberrypi-kernel/g' > latest_kernel

@@ -159,6 +159,7 @@ function finalize_image_pi() {
 		cd wifi-firmware || exit
 		git clone https://github.com/RPi-Distro/firmware-nonfree
 		set +f
+		cp firmware-nonfree/debian/config/brcm80211/cypress/cyfmac43455-sdio{-standard,}.bin
 		$SUDO cp ./firmware-nonfree/debian/config/brcm80211/brcm/*sdio* "${MOUNTPOINT}/lib/firmware/brcm/"
 		set -f
 	)

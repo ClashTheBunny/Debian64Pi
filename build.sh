@@ -179,7 +179,7 @@ function finalize_image_pi() {
 
 function base_bootstrap() {
 
-  $SUDO qemu-debootstrap --components=main,contrib,non-free --arch=arm64 "${RELEASE}" "${MOUNTPOINT}"
+  $SUDO qemu-debootstrap --components=main,contrib,non-free,non-free-firmware --arch=arm64 "${RELEASE}" "${MOUNTPOINT}"
 
 	# Make internet available from within the chroot, and setup fstab, hostname, and sources.list
 
@@ -193,16 +193,16 @@ function base_bootstrap() {
 
 	echo "debian-rpi64" | $SUDO tee "${MOUNTPOINT}/etc/hostname"
 
-	echo "deb http://deb.debian.org/debian/ ${RELEASE} main contrib non-free
-	#deb-src http://deb.debian.org/debian/ ${RELEASE} main contrib non-free " | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
+	echo "deb http://deb.debian.org/debian/ ${RELEASE} main contrib non-free non-free-firmware
+	#deb-src http://deb.debian.org/debian/ ${RELEASE} main contrib non-free non-free-firmware " | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
 
   if [[ ${RELEASE} == "stable" ]]; then
 
-    echo "deb http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free
-    #deb-src http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free
+    echo "deb http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free non-free-firmware
+    #deb-src http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free non-free-firmware
 
-    deb http://deb.debian.org/debian-security ${RELEASE}-security main contrib non-free
-    #deb-src http://deb.debian.org/debian-security ${RELEASE}-security main contrib non-free
+    deb http://deb.debian.org/debian-security ${RELEASE}-security main contrib non-free non-free-firmware
+    #deb-src http://deb.debian.org/debian-security ${RELEASE}-security main contrib non-free non-free-firmware
 
     deb http://deb.debian.org/debian ${RELEASE}-backports main
     #deb-src http://deb.debian.org/debian ${RELEASE}-backports main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"

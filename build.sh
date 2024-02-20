@@ -188,9 +188,11 @@ function base_bootstrap() {
 	$SUDO rm "${MOUNTPOINT}/etc/fstab"
 	$SUDO rm "${MOUNTPOINT}/etc/hostname"
 	$SUDO rm "${MOUNTPOINT}/etc/apt/sources.list"
+	ROOTUUID=$($SUDO blkid -s UUID -o export "${LOOPDEV}p2" | grep UUID)
+	BOOTUUID=$($SUDO blkid -s UUID -o export "${LOOPDEV}p1" | grep UUID)
 	echo "proc /proc proc defaults 0 0
-	/dev/mmcblk0p1 /boot vfat defaults 0 2
-	/dev/mmcblk0p2 / ext4 defaults,noatime 0 1" | $SUDO tee -a "${MOUNTPOINT}/etc/fstab"
+	$BOOTUUID /boot vfat defaults 0 2
+	$ROOTUUID / ext4 defaults,noatime 0 1" | $SUDO tee -a "${MOUNTPOINT}/etc/fstab"
 
 	echo "debian-rpi64" | $SUDO tee "${MOUNTPOINT}/etc/hostname"
 
@@ -228,7 +230,8 @@ function setup_pi() {
 		# differentiate from Pi3 64-bit kernels
 		kernel=kernel8-p4.img" | $SUDO tee -a "${MOUNTPOINT}/boot/config.txt"
 
-	echo "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline ds=nocloud;s=/boot/ rootwait" | $SUDO tee -a "${MOUNTPOINT}/boot/cmdline.txt"
+	ROOTUUID=$($SUDO blkid -s UUID -o export "${LOOPDEV}p2" | grep UUID)
+	echo "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=$ROOTUUID rootfstype=ext4 elevator=deadline ds=nocloud;s=/boot/ rootwait" | $SUDO tee -a "${MOUNTPOINT}/boot/cmdline.txt"
 
 
 }

@@ -15,7 +15,7 @@ TEMPDIR="${TEMPDIR:-/tmp}"
 if [[ $EUID -ne 0 ]]; then
 	SUDO="${SUDO:-sudo}"
 else
-  SUDO=""
+	SUDO=""
 fi
 
 function download_tegra_driver_package() {
@@ -72,14 +72,14 @@ $SUDO chroot "${MOUNTPOINT}" apt install device-tree-compiler fontconfig fontcon
 
 function finalize_image_jetson-nano() {
 
-  common_apt
+	common_apt
 
 	$SUDO cp libjpeg-turbo-dummy_1.0_all.deb "${MOUNTPOINT}"
 	$SUDO chroot "${MOUNTPOINT}" dpkg -i libjpeg-turbo-dummy_1.0_all.deb || true
 	$SUDO rm "${MOUNTPOINT}/libjpeg-turbo-dummy_1.0_all.deb"
 	$SUDO chroot "${MOUNTPOINT}" apt -f install -y
 
-  $SUDO chroot "${MOUNTPOINT}" apt install libwayland-egl1 libxkbcommon0 libasound2 libgstreamer1.0-0 libdw1 libunwind8 libasound2-data libgstreamer-plugins-bad1.0-0 libgstreamer-plugins-base1.0-0 libpangocairo-1.0-0 liborc-0.4-0 python2.7 python2.7-minimal libpython2.7-minimal libpython2.7-stdlib mime-support mailcap perl  libperl5.32 perl-modules-5.32 libgdbm-compat4 libffi-dev -y || true
+	$SUDO chroot "${MOUNTPOINT}" apt install libwayland-egl1 libxkbcommon0 libasound2 libgstreamer1.0-0 libdw1 libunwind8 libasound2-data libgstreamer-plugins-bad1.0-0 libgstreamer-plugins-base1.0-0 libpangocairo-1.0-0 liborc-0.4-0 python2.7 python2.7-minimal libpython2.7-minimal libpython2.7-stdlib mime-support mailcap perl  libperl5.32 perl-modules-5.32 libgdbm-compat4 libffi-dev -y || true
 
 	(
 		cd "${TEMPDIR}/jetson_driver_package/Linux_for_Tegra" || exit
@@ -130,27 +130,27 @@ function create_image_pi() {
 
 function finalize_image_pi() {
 
-  common_apt
+	common_apt
 
-  LATEST_PI_RELEASE="bookworm"
-  $SUDO apt-key --keyring ${MOUNTPOINT}/usr/share/keyrings/rpi.gpg adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
+	LATEST_PI_RELEASE="bookworm"
+	$SUDO apt-key --keyring ${MOUNTPOINT}/usr/share/keyrings/rpi.gpg adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
 
 	echo "deb [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main
 	#deb-src [arch=arm64 signed-by=/usr/share/keyrings/rpi.gpg] https://archive.raspberrypi.org/debian/ ${LATEST_PI_RELEASE} main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list.d/rpi.list"
 
-  echo "# Never prefer packages from the my-custom-repo repository
-  Package: *
-  Pin: origin archive.raspberrypi.org
-  Pin-Priority: 1
+	echo "# Never prefer packages from the my-custom-repo repository
+	Package: *
+	Pin: origin archive.raspberrypi.org
+	Pin-Priority: 1
 
-  # Allow upgrading only my-specific-software from my-custom-repo
-  Package: raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader rpi-eeprom
-  Pin: origin archive.raspberrypi.org
-  Pin-Priority: 500" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/preferences.d/99-rpi"
+	# Allow upgrading only my-specific-software from my-custom-repo
+	Package: raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader rpi-eeprom
+	Pin: origin archive.raspberrypi.org
+	Pin-Priority: 500" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/preferences.d/99-rpi"
 
-  $SUDO chroot "${MOUNTPOINT}" apt update
+	$SUDO chroot "${MOUNTPOINT}" apt update
 
-  $SUDO chroot "${MOUNTPOINT}" apt install -t $LATEST_PI_RELEASE raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader rpi-eeprom -y
+	$SUDO chroot "${MOUNTPOINT}" apt install -t $LATEST_PI_RELEASE raspberrypi-kernel raspberrypi-kernel-headers raspberrypi-bootloader rpi-eeprom -y
 
 	# Install Pi-compatible WiFi drivers to image
 
@@ -168,7 +168,7 @@ function finalize_image_pi() {
 	mkdir -p cloud-init
 	(
 		cd cloud-init || exit
-    git clone https://gist.github.com/5c81708b05fb4f68aecba7367b3bf033.git cloud-init/
+		git clone https://gist.github.com/5c81708b05fb4f68aecba7367b3bf033.git cloud-init/
 		set +f
 		$SUDO cp ./cloud-init/* "${MOUNTPOINT}/boot/"
 		set -f
@@ -180,7 +180,7 @@ function finalize_image_pi() {
 
 function base_bootstrap() {
 
-  $SUDO qemu-debootstrap --components=main,contrib,non-free,non-free-firmware --arch=arm64 "${RELEASE}" "${MOUNTPOINT}"
+	$SUDO qemu-debootstrap --components=main,contrib,non-free,non-free-firmware --arch=arm64 "${RELEASE}" "${MOUNTPOINT}"
 
 	# Make internet available from within the chroot, and setup fstab, hostname, and sources.list
 
@@ -197,36 +197,36 @@ function base_bootstrap() {
 	echo "deb http://deb.debian.org/debian/ ${RELEASE} main contrib non-free non-free-firmware
 	#deb-src http://deb.debian.org/debian/ ${RELEASE} main contrib non-free non-free-firmware " | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
 
-  if [[ ${RELEASE} == "stable" ]]; then
+	if [[ ${RELEASE} == "stable" ]]; then
 
-    echo "deb http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free non-free-firmware
-    #deb-src http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free non-free-firmware
+		echo "deb http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free non-free-firmware
+		#deb-src http://deb.debian.org/debian/ ${RELEASE}-updates main contrib non-free non-free-firmware
 
-    deb http://deb.debian.org/debian-security ${RELEASE}-security main contrib non-free non-free-firmware
-    #deb-src http://deb.debian.org/debian-security ${RELEASE}-security main contrib non-free non-free-firmware
+		deb http://deb.debian.org/debian-security ${RELEASE}-security main contrib non-free non-free-firmware
+		#deb-src http://deb.debian.org/debian-security ${RELEASE}-security main contrib non-free non-free-firmware
 
-    deb http://deb.debian.org/debian ${RELEASE}-backports main
-    #deb-src http://deb.debian.org/debian ${RELEASE}-backports main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
+		deb http://deb.debian.org/debian ${RELEASE}-backports main
+		#deb-src http://deb.debian.org/debian ${RELEASE}-backports main" | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
 
-  fi
+	fi
 
-  echo "
-  allow-hotplug wlan0
-  iface wlan0 inet dhcp
-  wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf" | $SUDO tee -a "${MOUNTPOINT}/etc/network/interfaces.d/wlan0" 
+	echo "
+	allow-hotplug wlan0
+	iface wlan0 inet dhcp
+	wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf" | $SUDO tee -a "${MOUNTPOINT}/etc/network/interfaces.d/wlan0" 
 }
 
 function setup_pi() {
 	# Setup bootloader config
 
-  # It's fine to have this on a pi3, as it will be ignored.
+	# It's fine to have this on a pi3, as it will be ignored.
 	echo "[pi4]
-    # Enable DRM VC4 V3D driver on top of the dispmanx display stack
-    dtoverlay=vc4-fkms-v3d
-    max_framebuffers=2
-    arm_64bit=1
-    # differentiate from Pi3 64-bit kernels
-    kernel=kernel8-p4.img" | $SUDO tee -a "${MOUNTPOINT}/boot/config.txt"
+		# Enable DRM VC4 V3D driver on top of the dispmanx display stack
+		dtoverlay=vc4-fkms-v3d
+		max_framebuffers=2
+		arm_64bit=1
+		# differentiate from Pi3 64-bit kernels
+		kernel=kernel8-p4.img" | $SUDO tee -a "${MOUNTPOINT}/boot/config.txt"
 
 	echo "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline ds=nocloud;s=/boot/ rootwait" | $SUDO tee -a "${MOUNTPOINT}/boot/cmdline.txt"
 

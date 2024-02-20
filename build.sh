@@ -230,8 +230,8 @@ function setup_pi() {
 		# differentiate from Pi3 64-bit kernels
 		kernel=kernel8-p4.img" | $SUDO tee -a "${MOUNTPOINT}/boot/config.txt"
 
-	ROOTUUID=$($SUDO blkid -s UUID -o export "${LOOPDEV}p2" | grep UUID)
-	echo "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=$ROOTUUID rootfstype=ext4 elevator=deadline ds=nocloud;s=/boot/ rootwait" | $SUDO tee -a "${MOUNTPOINT}/boot/cmdline.txt"
+	ROOTPARTUUID=$($SUDO blkid -s PARTUUID -o export "${LOOPDEV}p2" | grep PARTUUID)
+	echo "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=$ROOTPARTUUID rootfstype=ext4 elevator=deadline ds=nocloud;s=/boot/ rootwait" | $SUDO tee -a "${MOUNTPOINT}/boot/cmdline.txt"
 
 
 }

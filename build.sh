@@ -117,7 +117,7 @@ function create_image_pi() {
 	if [[ $GRAPHICAL == true ]]; then
 		$SUDO gparted "$LOOPDEV"
 	else
-		printf "o\nn\np\n1\n\n+70M\nt\n0c\nn\np\n\n\n\n\nw\n" | $SUDO fdisk "$LOOPDEV"
+		printf "o\nn\np\n1\n\n+256M\nt\n0c\nn\np\n\n\n\n\nw\n" | $SUDO fdisk "$LOOPDEV"
 		$SUDO mkfs.fat -F32 -v -I -n'BOOT' "${LOOPDEV}p1"
 		$SUDO mkfs.ext4 -F -O '^64bit' -L 'root' "${LOOPDEV}p2"
 	fi

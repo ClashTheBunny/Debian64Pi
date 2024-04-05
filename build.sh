@@ -19,10 +19,10 @@ else
 fi
 
 function download_tegra_driver_package() {
-	wget -c https://developer.nvidia.com/embedded/L4T/r32_Release_v4.2/t210ref_release_aarch64/Tegra210_Linux_R32.4.2_aarch64.tbz2
+	wget -c https://developer.nvidia.com/embedded/l4t/r32_release_v5.2/t210/jetson-210_linux_r32.5.2_aarch64.tbz2
 	# wget -c https://developer.nvidia.com/embedded/L4T/r32_Release_v4.2/t210ref_release_aarch64/Tegra_Linux_Sample-Root-Filesystem_R32.4.2_aarch64.tbz2
 	$SUDO mkdir -p "${TEMPDIR}/jetson_driver_package/"
-	$SUDO tar xf Tegra210_Linux_R32.4.2_aarch64.tbz2 -C "${TEMPDIR}/jetson_driver_package/"
+	$SUDO tar xf jetson-210_linux_r32.5.2_aarch64.tbz2 -C "${TEMPDIR}/jetson_driver_package/"
 	$SUDO chown root:root "${TEMPDIR}/jetson_driver_package/Linux_for_Tegra/rootfs"
 }
 
@@ -84,9 +84,9 @@ function finalize_image_jetson-nano() {
 	(
 		cd "${TEMPDIR}/jetson_driver_package/Linux_for_Tegra" || exit
 
-		sudo cp "nv_tegra/l4t_deb_packages/nvidia-l4t-init_32.4.2-20200408182156_arm64.deb" "${MOUNTPOINT}"
-		$SUDO chroot "${MOUNTPOINT}" dpkg -i --force-confnew --force-depends --force-overwrite /nvidia-l4t-init_32.4.2-20200408182156_arm64.deb
-		$SUDO rm "${MOUNTPOINT}/nvidia-l4t-init_32.4.2-20200408182156_arm64.deb"
+		sudo cp "nv_tegra/l4t_deb_packages/nvidia-l4t-init_*.deb" "${MOUNTPOINT}"
+		$SUDO chroot "${MOUNTPOINT}" dpkg -i --force-confnew --force-depends --force-overwrite /nvidia-l4t-init_*.deb
+		$SUDO rm "${MOUNTPOINT}/nvidia-l4t-init_*.deb"
 
 		# $SUDO chroot "${MOUNTPOINT}" groupdel trusty
 		# $SUDO chroot "${MOUNTPOINT}" groupdel crypto

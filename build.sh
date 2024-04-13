@@ -66,7 +66,7 @@ function base_bootstrap() {
 	$SUDO rm "${MOUNTPOINT}/etc/fstab"
 	$SUDO rm "${MOUNTPOINT}/etc/hostname"
 	$SUDO rm "${MOUNTPOINT}/etc/apt/sources.list"
-	if [[ -z $LOOPDEV ]]; then
+	if [[ -v LOOPDEV ]]; then
 		ROOTUUID=/dev/mmcblk0p2
 		BOOTUUID=/dev/mmcblk0p1
 	else

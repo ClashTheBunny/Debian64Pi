@@ -188,8 +188,13 @@ function base_bootstrap() {
 	$SUDO rm "${MOUNTPOINT}/etc/fstab"
 	$SUDO rm "${MOUNTPOINT}/etc/hostname"
 	$SUDO rm "${MOUNTPOINT}/etc/apt/sources.list"
-	ROOTUUID=$($SUDO blkid -s UUID -o export "${LOOPDEV}p2" | grep UUID)
-	BOOTUUID=$($SUDO blkid -s UUID -o export "${LOOPDEV}p1" | grep UUID)
+	if [[ -z $LOOPDEV ]]; then
+		ROOTUUID=/dev/mmcblk0p2
+		BOOTUUID=/dev/mmcblk0p1
+	else
+		ROOTUUID=$($SUDO blkid -s UUID -o export "${LOOPDEV}p2" | grep UUID)
+		BOOTUUID=$($SUDO blkid -s UUID -o export "${LOOPDEV}p1" | grep UUID)
+	fi
 	echo "proc /proc proc defaults 0 0
 	$BOOTUUID /boot vfat defaults 0 2
 	$ROOTUUID / ext4 defaults,noatime 0 1" | $SUDO tee -a "${MOUNTPOINT}/etc/fstab"

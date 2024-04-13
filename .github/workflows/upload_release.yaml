@@ -8,6 +8,10 @@ on:
 
 name: Upload Release Asset
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   release:
     name: Create Release
@@ -29,9 +33,6 @@ jobs:
   build:
     name: Upload Release Asset
     runs-on: ubuntu-latest
-    concurrency:
-      group: build-group
-      cancel-in-progress: true
     needs: [release]
     continue-on-error: ${{ matrix.experimental }}
     strategy:

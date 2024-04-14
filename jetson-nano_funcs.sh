@@ -28,9 +28,9 @@ function finalize_image_jetson-nano() {
 	(
 		cd "${TEMPDIR}/jetson_driver_package/Linux_for_Tegra" || exit
 
-		sudo cp nv_tegra/l4t_deb_packages/nvidia-l4t-init_*.deb "${MOUNTPOINT}"
-		$SUDO chroot "${MOUNTPOINT}" dpkg -i --force-confnew --force-depends --force-overwrite /nvidia-l4t-init_*.deb
-		$SUDO rm ${MOUNTPOINT}/nvidia-l4t-init_*.deb
+		sudo cp "nv_tegra/l4t_deb_packages/nvidia-l4t-init_32.5.2-20210709090126_arm64.deb" "${MOUNTPOINT}"
+		$SUDO chroot "${MOUNTPOINT}" dpkg -i --force-confnew --force-depends --force-overwrite /nvidia-l4t-init_32.5.2-20210709090126_arm64.deb
+		$SUDO rm "${MOUNTPOINT}/nvidia-l4t-init_32.5.2-20210709090126_arm64.deb"
 
 		# $SUDO chroot "${MOUNTPOINT}" groupdel trusty
 		# $SUDO chroot "${MOUNTPOINT}" groupdel crypto

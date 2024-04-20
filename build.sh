@@ -63,9 +63,8 @@ function base_bootstrap() {
 	# Make internet available from within the chroot, and setup fstab, hostname, and sources.list
 
 	$SUDO cp /etc/resolv.conf "${MOUNTPOINT}/etc/resolv.conf"
+
 	$SUDO rm "${MOUNTPOINT}/etc/fstab"
-	$SUDO rm "${MOUNTPOINT}/etc/hostname"
-	$SUDO rm "${MOUNTPOINT}/etc/apt/sources.list"
 	if [[ -v LOOPDEV ]]; then
 		ROOTUUID=$($SUDO blkid -s UUID -o export "${LOOPDEV}p2" | grep UUID)
 		BOOTUUID=$($SUDO blkid -s UUID -o export "${LOOPDEV}p1" | grep UUID)
@@ -77,8 +76,10 @@ function base_bootstrap() {
 	$BOOTUUID /boot vfat defaults,nofail 0 2
 	$ROOTUUID / ext4 defaults,noatime 0 1" | $SUDO tee -a "${MOUNTPOINT}/etc/fstab"
 
+	$SUDO rm "${MOUNTPOINT}/etc/hostname"
 	echo "debian-rpi64" | $SUDO tee "${MOUNTPOINT}/etc/hostname"
 
+	$SUDO rm "${MOUNTPOINT}/etc/apt/sources.list"
 	echo "deb http://deb.debian.org/debian/ ${RELEASE} main contrib non-free non-free-firmware
 	#deb-src http://deb.debian.org/debian/ ${RELEASE} main contrib non-free non-free-firmware " | $SUDO tee -a "${MOUNTPOINT}/etc/apt/sources.list"
 

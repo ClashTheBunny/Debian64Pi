@@ -20,8 +20,8 @@ function finalize_image_jetson-nano() {
 
 	equivs-build libjpeg-turbo8-dummy
 	equivs-build libffi6-dummy
-	$SUDO cp /tmp/$USER/libjpeg-turbo-dummy_1.0_all.deb "${MOUNTPOINT}"
-	$SUDO cp /tmp/$USER/libffi6-dummy_1.0_all.deb "${MOUNTPOINT}"
+	$SUDO cp libjpeg-turbo-dummy_1.0_all.deb "${MOUNTPOINT}"
+	$SUDO cp libffi6-dummy_1.0_all.deb "${MOUNTPOINT}"
 	$SUDO chroot "${MOUNTPOINT}" dpkg -i libjpeg-turbo-dummy_1.0_all.deb || true
 	$SUDO chroot "${MOUNTPOINT}" dpkg -i libffi6-dummy_1.0_all.deb || true
 	$SUDO rm "${MOUNTPOINT}/libjpeg-turbo-dummy_1.0_all.deb"

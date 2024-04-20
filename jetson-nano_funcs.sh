@@ -38,6 +38,7 @@ function finalize_image_jetson-nano() {
 			sudo cp "nv_tegra/l4t_deb_packages/${package}_32.5.2-20210709090126_arm64.deb" "${MOUNTPOINT}"
 		done
 		$SUDO chroot "${MOUNTPOINT}" bash -c "dpkg -i --force-confnew --force-depends --force-overwrite /nvidia-l4t-init*.deb"
+		$SUDO chroot "${MOUNTPOINT}" bash -c "dpkg -i --force-confnew --force-depends --force-overwrite /nvidia-l4t-core*.deb"
 
 		# $SUDO chroot "${MOUNTPOINT}" groupdel trusty
 		# $SUDO chroot "${MOUNTPOINT}" groupdel crypto

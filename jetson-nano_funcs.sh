@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 function download_tegra_driver_package() {
-	wget -c https://developer.nvidia.com/embedded/l4t/r32_release_v5.2/t210/jetson-210_linux_r32.5.2_aarch64.tbz2
+	wget -c https://developer.nvidia.com/embedded/l4t/r32_release_v7.1/t210/jetson-210_linux_r32.7.1_aarch64.tbz2
 	# wget -c https://developer.nvidia.com/embedded/L4T/r32_Release_v4.2/t210ref_release_aarch64/Tegra_Linux_Sample-Root-Filesystem_R32.4.2_aarch64.tbz2
 	$SUDO mkdir -p "${TEMPDIR}/jetson_driver_package/"
-	$SUDO tar xf jetson-210_linux_r32.5.2_aarch64.tbz2 -C "${TEMPDIR}/jetson_driver_package/"
+	$SUDO tar xf jetson-210_linux_r32.7.1_aarch64.tbz2 -C "${TEMPDIR}/jetson_driver_package/"
 	$SUDO chown root:root "${TEMPDIR}/jetson_driver_package/Linux_for_Tegra/rootfs"
 }
 
@@ -35,7 +35,7 @@ function finalize_image_jetson-nano() {
 
 		for package in nvidia-l4t-3d-core nvidia-l4t-apt-source nvidia-l4t-camera nvidia-l4t-configs nvidia-l4t-core nvidia-l4t-cuda nvidia-l4t-firmware nvidia-l4t-graphics-demos nvidia-l4t-gstreamer nvidia-l4t-init nvidia-l4t-jetson-io nvidia-l4t-libvulkan nvidia-l4t-multimedia nvidia-l4t-multimedia-utils nvidia-l4t-oem-config nvidia-l4t-tools nvidia-l4t-wayland nvidia-l4t-weston nvidia-l4t-x11; do
 
-			sudo cp "nv_tegra/l4t_deb_packages/${package}_32.5.2-20210709090126_arm64.deb" "${MOUNTPOINT}"
+			sudo cp "nv_tegra/l4t_deb_packages/${package}_32.7.1-20220219090432_arm64.deb" "${MOUNTPOINT}"
 		done
 		$SUDO chroot "${MOUNTPOINT}" bash -c "dpkg -i --force-confnew --force-depends --force-overwrite /nvidia-l4t-init*.deb"
 

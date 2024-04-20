@@ -39,6 +39,8 @@ function finalize_image_jetson-nano() {
 		done
 		$SUDO chroot "${MOUNTPOINT}" bash -c "dpkg -i --force-confnew --force-depends --force-overwrite /nvidia-l4t-init*.deb"
 
+		sed -i -e 's#rw rootwait#systemd.unified_cgroup_hierarchy=0 cgroup_enable=cpuset cgroup_enable=cpu cgroup_memory=1 cgroup_enable=memory rw rootwait#g' "${MOUNTPOINT}/boot/extlinux/extlinux.conf"
+
 		# $SUDO chroot "${MOUNTPOINT}" groupdel trusty
 		# $SUDO chroot "${MOUNTPOINT}" groupdel crypto
 
@@ -52,10 +54,13 @@ function finalize_image_jetson-nano() {
 		git clone https://gist.github.com/5c81708b05fb4f68aecba7367b3bf033.git cloud-init/
 		set +f
 		$SUDO cp ./cloud-init/* "${MOUNTPOINT}/boot/"
+		sed -i -e 's#rw rootwait#ds=nocloud;s=/boot/ rw rootwait#g' "${MOUNTPOINT}/boot/extlinux/extlinux.conf"
+
 		set -f
 	)
 
 	rm -rf cloud-init
+
 
 	chroot_tear_down
 

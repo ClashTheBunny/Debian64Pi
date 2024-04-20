@@ -74,7 +74,7 @@ function base_bootstrap() {
 		BOOTUUID=/dev/mmcblk0p1
 	fi
 	echo "proc /proc proc defaults 0 0
-	$BOOTUUID /boot vfat defaults 0 2
+	$BOOTUUID /boot vfat defaults,nofail 0 2
 	$ROOTUUID / ext4 defaults,noatime 0 1" | $SUDO tee -a "${MOUNTPOINT}/etc/fstab"
 
 	echo "debian-rpi64" | $SUDO tee "${MOUNTPOINT}/etc/hostname"

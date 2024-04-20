@@ -70,7 +70,7 @@ jobs:
           CI: true
         run: |
           sudo apt update
-          sudo apt install qemu gparted debootstrap qemu-user-static qemu-utils schroot debian-keyring debian-archive-keyring
+          sudo apt install qemu gparted debootstrap qemu-user-static qemu-utils schroot debian-keyring debian-archive-keyring equivs
           bash -x ./build.sh
           zip debian-${{ matrix.board }}-${{ matrix.revision }}-${{ matrix.debian-release }}.zip debian-${{ matrix.board }}.img
       - name: Start SSH via Ngrok

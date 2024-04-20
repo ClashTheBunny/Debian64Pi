@@ -36,9 +36,9 @@ function finalize_image_jetson-nano() {
 		for package in nvidia-l4t-3d-core nvidia-l4t-apt-source nvidia-l4t-camera nvidia-l4t-configs nvidia-l4t-core nvidia-l4t-cuda nvidia-l4t-firmware nvidia-l4t-graphics-demos nvidia-l4t-gstreamer nvidia-l4t-init nvidia-l4t-jetson-io nvidia-l4t-libvulkan nvidia-l4t-multimedia nvidia-l4t-multimedia-utils nvidia-l4t-oem-config nvidia-l4t-tools nvidia-l4t-wayland nvidia-l4t-weston nvidia-l4t-x11; do
 
 			sudo cp "nv_tegra/l4t_deb_packages/${package}_32.5.2-20210709090126_arm64.deb" "${MOUNTPOINT}"
-			$SUDO chroot "${MOUNTPOINT}" dpkg -i --force-confnew --force-depends --force-overwrite /${package}_32.5.2-20210709090126_arm64.deb
-			$SUDO rm "${MOUNTPOINT}/${package}_32.5.2-20210709090126_arm64.deb"
 		done
+		$SUDO chroot "${MOUNTPOINT}" bash -c "dpkg -i --force-confnew --force-depends --force-overwrite /*.deb"
+		$SUDO rm "${MOUNTPOINT}/*.deb"
 
 		# $SUDO chroot "${MOUNTPOINT}" groupdel trusty
 		# $SUDO chroot "${MOUNTPOINT}" groupdel crypto
